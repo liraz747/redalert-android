@@ -21,15 +21,26 @@ require_file() {
 
 wait_for_boot() {
   adb wait-for-device
-  local timeout=180
+  local timeout=300
   local start
   start="$(date +%s)"
   while true; do
-    if [[ "$(adb shell getprop sys.boot_completed | tr -d '\r')" == "1" ]]; then
+    local state
+    state="$(adb get-state 2>/dev/null || true)"
+    if [[ "$state" != "device" ]]; then
+      adb reconnect offline >/dev/null 2>&1 || true
+      adb wait-for-device >/dev/null 2>&1 || true
+      sleep 2
+      continue
+    fi
+
+    if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; then
+      adb shell input keyevent 82 >/dev/null 2>&1 || true
       break
     fi
     if (( "$(date +%s)" - start > timeout )); then
       echo "Emulator did not boot within ${timeout}s" >&2
+      adb devices >&2 || true
       exit 1
     fi
     sleep 2
@@ -245,4 +256,3 @@ echo "Asserting logcat is clean for target crashes..."
 assert_logcat_clean
 
 echo "Cloud emulator validation completed successfully."
-
