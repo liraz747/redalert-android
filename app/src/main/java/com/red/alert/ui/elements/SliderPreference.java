@@ -1,10 +1,12 @@
 package com.red.alert.ui.elements;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 
 import androidx.preference.DialogPreference;
+import androidx.preference.PreferenceDataStore;
 import androidx.preference.PreferenceViewHolder;
 
 import com.red.alert.R;
@@ -52,13 +54,54 @@ public class SliderPreference extends DialogPreference {
 
     // Public wrapper for protected getPersistedInt
     public int getPersistedValue(int defaultValue) {
-        return getPersistedInt(defaultValue);
+        try {
+            int persisted = getPersistedInt(defaultValue);
+            return clamp(persisted);
+        } catch (ClassCastException ignored) {
+            // Backward compatibility: previous versions stored slider values as float [0..1].
+            float legacyValue = getPersistedFloat(defaultValue / 100.0f);
+            int migrated;
+            if (legacyValue >= 0f && legacyValue <= 1f) {
+                migrated = Math.round(legacyValue * 100f);
+            } else {
+                migrated = Math.round(legacyValue);
+            }
+
+            migrated = clamp(migrated);
+            persistIntCompat(migrated);
+
+            return migrated;
+        }
     }
 
     // Public wrapper for protected persistInt
     public void setPersistedValue(int value) {
-        if (shouldPersist()) {
-            persistInt(value);
+        int clamped = clamp(value);
+        persistIntCompat(clamped);
+    }
+
+    private int clamp(int value) {
+        return Math.max(mMin, Math.min(mMax, value));
+    }
+
+    private void persistIntCompat(int value) {
+        if (!shouldPersist()) {
+            return;
         }
+
+        PreferenceDataStore dataStore = getPreferenceDataStore();
+        if (dataStore != null) {
+            dataStore.putInt(getKey(), value);
+            return;
+        }
+
+        SharedPreferences preferences = getSharedPreferences();
+        if (preferences == null) {
+            return;
+        }
+
+        // Remove legacy float value before writing int to prevent ClassCastException
+        // from Preference.persistInt() internals during type migration.
+        preferences.edit().remove(getKey()).putInt(getKey(), value).apply();
     }
 }

@@ -15,6 +15,8 @@
     <string name="registrationFailed">Registration failed, please try again later.</string>
     <string name="grantNotificationPermission">Please enable \"Notifications\" on the next screen to receive alerts in real time.</string>
     <string name="citySelectionLimitError">Please do not select more than 100 cities.</string>
+    <string name="multiSelectionSearchNoResults">No results were found that match the search terms you entered.</string>
+    <string name="multiSelectionSearchNoResultSelected">You did not select a city or zone. Please select at least one result and try again.</string>
     <string name="settings">Settings</string>
     <string name="advanced">Advanced</string>
     <string name="advancedSettings">Advanced settings</string>
@@ -278,6 +280,7 @@
     <string name="continueStayingInsideShelterInstructions">Continue staying inside protective shelter</string>
     <string name="endStayNearbyShelterInstructions">End of stay near protective shelter</string>
     <string name="missileThreatEndInstructions">Rocket fire - event ended</string>
+    <string name="earthQuakeThreatEndInstructions">Earthquake - event ended - you may now safely re-enter buildings</string>
     <string name="terroristInfiltrationThreatEndInstructions">Terrorist infiltration - event ended - you may now leave the shelter</string>
     <string name="terroristInfiltrationConcernLiftedInstructions">Terrorist infiltration - concern lifted</string>
     <string name="hostileAircraftIntrusionThreatEndInstructions">Hostile aircraft intrusion - event ended</string>

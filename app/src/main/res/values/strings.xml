@@ -215,6 +215,9 @@
     <string name="registrationFailed">ההרשמה לשירות העדכונים נכשלה. אנא נסה מאוחר יותר.</string>
     <string name="grantNotificationPermission">יש לאפשר קבלת התראות מהאפליקציה במסך הבא.</string>
     <string name="citySelectionLimitError">לא ניתן לבחור יותר מ-100 יישובים.</string>
+    <string name="multiSelectionSearchNoResults">לא נמצאו תוצאות שתואמות את מילות החיפוש שהקלדת.</string>
+    <string name="multiSelectionSearchNoResultSelected">לא בחרת יישוב או מרחב, יש לבחור לפחות תוצאה אחת ולנסות שוב.</string>
+    <string name="multiSelectionDataUnavailable">אירעה שגיאה בטעינת רשימת הבחירה. נסה לסגור ולפתוח מחדש את המסך.</string>
 
     <!-- Success Messages -->
     <string name="registrationID">קוד הרשמה</string>
@@ -314,6 +317,7 @@
     <string name="continueStayingInsideShelterInstructions">יש להמשיך לשהות במרחב המוגן</string>
     <string name="endStayNearbyShelterInstructions">סיום שהייה בסמיכות למרחב מוגן</string>
     <string name="missileThreatEndInstructions">ירי רקטות וטילים - האירוע הסתיים</string>
+    <string name="earthQuakeThreatEndInstructions">בעקבות רעידת האדמה - הנחיות לחזרה למבנים</string>
     <string name="terroristInfiltrationThreatEndInstructions">הסתיים אירוע חדירת מחבלים - ניתן לצאת מהבתים</string>
     <string name="terroristInfiltrationConcernLiftedInstructions">חדירת מחבלים - החשש הוסר</string>
     <string name="hostileAircraftIntrusionThreatEndInstructions">חדירת כלי טיס עוין - האירוע הסתיים</string>
@@ -391,7 +395,7 @@
     <string translatable="false" name="websitePref">website</string>
     <string translatable="false" name="fcmTokenPref">gcm_registration_token</string>
     <string translatable="false" name="pushyTokenPref">pushy_registration_token_v2</string>
-    <string translatable="false" name="tutorialPref">tutorial_1_0_23</string>
+    <string translatable="false" name="tutorialPref">tutorial_1_0_24</string>
     <string translatable="false" name="donatePref">donate</string>
     <string translatable="false" name="ratePref">rating</string>
     <string translatable="false" name="lifeshieldPref">lifeshield</string>

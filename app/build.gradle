@@ -10,8 +10,8 @@ android {
         applicationId "com.red.alert"
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 10970
-        versionName "1.0.97"
+        versionCode 10980
+        versionName "1.0.98"
     }
     buildTypes {
         release {
@@ -22,7 +22,7 @@ android {
 
 dependencies {
     // Pushy Android SDK
-    implementation 'me.pushy:sdk:1.0.121'
+    implementation 'me.pushy:sdk:1.0.126'
 
     // PrettyTime
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.4.Final'

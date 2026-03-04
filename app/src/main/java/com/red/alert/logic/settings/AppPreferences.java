@@ -43,13 +43,29 @@ public class AppPreferences {
     }
 
     public static boolean getTutorialDisplayed(Context context) {
+        List<String> subscriptions = AppPreferences.getSubscriptions(context);
+        boolean hasActiveSubscriptions = !subscriptions.isEmpty();
+
         // No regions/cities selected?
-        if (AppPreferences.getNotificationsEnabled(context) && AppPreferences.getSubscriptions(context).size() == 0) {
+        if (AppPreferences.getNotificationsEnabled(context) && !hasActiveSubscriptions) {
             return false;
         }
 
-        // Get saved preference
-        return Singleton.getSharedPreferences(context).getBoolean(context.getString(R.string.tutorialPref), false);
+        android.content.SharedPreferences preferences = Singleton.getSharedPreferences(context);
+        boolean tutorialDisplayed = preferences.getBoolean(context.getString(R.string.tutorialPref), false);
+
+        // Backward compatibility:
+        // keep previously displayed tutorial state from recent keys and preserve configured-user upgrades.
+        if (!tutorialDisplayed) {
+            boolean legacyDisplayed = preferences.getBoolean("tutorial_1_0_24", false)
+                    || preferences.getBoolean("tutorial_1_0_23", false);
+            if (legacyDisplayed || hasActiveSubscriptions) {
+                preferences.edit().putBoolean(context.getString(R.string.tutorialPref), true).commit();
+                tutorialDisplayed = true;
+            }
+        }
+
+        return tutorialDisplayed;
     }
 
     public static boolean getPopupEnabled(Context context) {

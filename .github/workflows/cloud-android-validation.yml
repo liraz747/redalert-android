@@ -1,0 +1,66 @@
+name: Cloud Android Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - material3-redesign
+      - codex/**
+
+jobs:
+  build-and-emulator-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Make scripts executable
+        run: |
+          chmod +x gradlew
+          chmod +x .github/scripts/cloud_emulator_validation.sh
+          chmod +x .github/scripts/uiauto_helper.py
+
+      - name: Build current branch debug APK
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Fetch upstream master and build debug APK
+        run: |
+          git remote add upstream https://github.com/eladnava/redalert-android.git || true
+          git fetch --no-tags upstream master
+          mkdir -p .ci
+          git worktree add .ci/upstream-master FETCH_HEAD
+          cd .ci/upstream-master
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Run cloud emulator migration and regression validation
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: |
+            bash .github/scripts/cloud_emulator_validation.sh
+
+      - name: Upload validation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-android-validation-artifacts
+          path: .ci/results
+          if-no-files-found: warn
+

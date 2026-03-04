@@ -166,7 +166,7 @@ public class SliderPreferenceDialogFragmentCompat extends PreferenceDialogFragme
     public void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {
             SliderPreference preference = getSliderPreference();
-            if (preference != null) {
+            if (preference != null && mSeekBar != null) {
                 int newValue = (int) mSeekBar.getValue();
                 if (preference.callChangeListener(newValue)) {
                     // Persist value using public wrapper

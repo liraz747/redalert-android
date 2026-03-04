@@ -12,6 +12,8 @@
     <string name="registrationFailed">فشل التسجيل، يرجى المحاولة مرة أخرى لاحقًا.</string>
     <string name="grantNotificationPermission">يُرجى تمكين \"الإشعارات\" على الشاشة التالية لتلقي التنبيهات في الوقت الفعلي.</string>
     <string name="citySelectionLimitError">لا يمكن تحديد أكثر من ١٠٠ مدينة.</string>
+    <string name="multiSelectionSearchNoResults">لم يتم العثور على أي نتائج تطابق مصطلحات البحث التي أدخلتها.</string>
+    <string name="multiSelectionSearchNoResultSelected">لم تقم باختيار مدينة أو منطقة. يرجى اختيار نتيجة واحدة على الأقل والمحاولة مرة أخرى.</string>
     <string name="settings">الإعدادات</string>
     <string name="advanced">متقدم</string>
     <string name="advancedSettings">الإعدادات المتقدمة</string>
@@ -275,6 +277,7 @@
     <string name="continueStayingInsideShelterInstructions">استمر في البقاء داخل المأوى المحمي</string>
     <string name="endStayNearbyShelterInstructions">إنهاء البقاء بالقرب من الملجأ</string>
     <string name="missileThreatEndInstructions">إطلاق صاروخ - انتهى الحدث</string>
+    <string name="earthQuakeThreatEndInstructions">زلزال - انتهى الحدث - يمكنك الآن العودة إلى المباني</string>
     <string name="terroristInfiltrationThreatEndInstructions">تسلل إرهابي – انتهى الحدث – يمكنكم الآن مغادرة المأوى</string>
     <string name="terroristInfiltrationConcernLiftedInstructions">تسلل إرهابي - تم رفع القلق</string>
     <string name="hostileAircraftIntrusionThreatEndInstructions">انتهاء الحدث باقتحام طائرة معادية</string>

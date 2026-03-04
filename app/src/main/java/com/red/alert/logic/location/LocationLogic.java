@@ -28,7 +28,10 @@ public class LocationLogic {
 
     public static int getUpdateIntervalMinutes(Context context, float overrideSetting) {
         // Get stored value
-        float sliderValue = Singleton.getSharedPreferences(context).getFloat(context.getString(R.string.gpsFrequencyPref), Float.parseFloat(context.getString(R.string.defaultGPSPollingFrequency)));
+        float sliderValue = getSliderValueCompat(
+                context,
+                context.getString(R.string.gpsFrequencyPref),
+                Float.parseFloat(context.getString(R.string.defaultGPSPollingFrequency)));
 
         // Override it?
         if (overrideSetting != -1) {
@@ -44,7 +47,10 @@ public class LocationLogic {
 
     public static int getMaxDistanceKilometers(Context context, float overrideSetting) {
         // Get stored value
-        float sliderValue = Singleton.getSharedPreferences(context).getFloat(context.getString(R.string.maxDistancePref), Float.parseFloat(context.getString(R.string.defaultGPSMaxDistance)));
+        float sliderValue = getSliderValueCompat(
+                context,
+                context.getString(R.string.maxDistancePref),
+                Float.parseFloat(context.getString(R.string.defaultGPSMaxDistance)));
 
         // Override it?
         if (overrideSetting != -1) {
@@ -61,6 +67,16 @@ public class LocationLogic {
     public static long getUpdateIntervalMilliseconds(Context context) {
         // Convert to milliseconds
         return getUpdateIntervalMinutes(context, -1) * 60 * 1000;
+    }
+
+    private static float getSliderValueCompat(Context context, String key, float defaultValue) {
+        SharedPreferences preferences = Singleton.getSharedPreferences(context);
+        try {
+            return preferences.getFloat(key, defaultValue);
+        } catch (ClassCastException ignored) {
+            int intValue = preferences.getInt(key, Math.round(defaultValue * 100f));
+            return intValue / 100.0f;
+        }
     }
 
     public static void saveLastKnownLocation(Context context, float latitude, float longitude) {

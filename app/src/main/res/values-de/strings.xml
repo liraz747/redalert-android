@@ -12,6 +12,8 @@
     <string name="registrationFailed">Die anmeldung ist Fehlgeschlagen, versuches es zu einem Späteren zeitpung noch einmal.</string>
     <string name="grantNotificationPermission">Bitte aktivieren Sie \"Benachrichtigungen\" auf dem nächsten Bildschirm, um Benachrichtigungen in Echtzeit zu erhalten.</string>
     <string name="citySelectionLimitError">Bitte wählen Sie nicht mehr als 100 Städte aus.</string>
+    <string name="multiSelectionSearchNoResults">Es wurden keine Ergebnisse gefunden, die den eingegebenen Suchbegriffen entsprechen.</string>
+    <string name="multiSelectionSearchNoResultSelected">Sie haben keine Stadt oder Zone ausgewählt. Bitte wählen Sie mindestens ein Ergebnis aus und versuchen Sie es erneut.</string>
     <string name="settings">Einstellungen</string>
     <string name="advanced">Erweiterungen</string>
     <string name="advancedSettings">Erweiterte Einstellungen</string>
@@ -275,6 +277,7 @@
     <string name="continueStayingInsideShelterInstructions">Bleiben Sie weiterhin im Schutzraum</string>
     <string name="endStayNearbyShelterInstructions">In der Nähe des Schutzraums bleiben</string>
     <string name="missileThreatEndInstructions">Raketenfeuer – Ereignis beendet</string>
+    <string name="earthQuakeThreatEndInstructions">Erdbeben – Ereignis beendet – Sie können jetzt in die Gebäude zurückkehren</string>
     <string name="terroristInfiltrationThreatEndInstructions">Terroristische Infiltration – Ereignis beendet – Sie können jetzt den Schutzraum verlassen</string>
     <string name="terroristInfiltrationConcernLiftedInstructions">Terroristische Infiltration – Sorge aufgehoben</string>
     <string name="hostileAircraftIntrusionThreatEndInstructions">Eindringen in feindliche Flugzeuge – Ereignis beendet</string>

@@ -44,6 +44,7 @@ public class SearchableMultiSelectPreference extends ListPreference {
     private static final String DEFAULT_SEPARATOR = "OV=I=XseparatorX=I=VO";
     private String separator;
     private String checkAllKey = null;
+    private String mCurrentSearchText = null;
     private boolean[] mClickedDialogEntryIndices;
     private AlertDialog mDialog;
     private static Context mContext;
@@ -113,8 +114,20 @@ public class SearchableMultiSelectPreference extends ListPreference {
         final String[] zoneNames = LocationData.getAllCityZones(getContext());
 
         if (entries == null || entryValues == null || entries.length != entryValues.length) {
-            throw new IllegalStateException(
-                    "ListPreference requires an entries array and an entryValues array which are both the same length");
+            AlertDialogBuilder.showGenericDialog(
+                    getContext().getString(R.string.error),
+                    getContext().getString(R.string.multiSelectionDataUnavailable),
+                    getContext().getString(R.string.okay),
+                    null,
+                    false,
+                    getContext(),
+                    null
+            );
+            return;
+        }
+
+        if (mClickedDialogEntryIndices == null || mClickedDialogEntryIndices.length != entries.length) {
+            mClickedDialogEntryIndices = new boolean[entries.length];
         }
 
         restoreCheckedEntries();
@@ -275,6 +288,7 @@ public class SearchableMultiSelectPreference extends ListPreference {
             public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
             @Override
             public void afterTextChanged(Editable arg0) {
+                mCurrentSearchText = searchEditText.getText().toString();
                 objectsAdapter.getFilter().filter(searchEditText.getText());
             }
         });
@@ -312,6 +326,26 @@ public class SearchableMultiSelectPreference extends ListPreference {
                         return;
                     }
 
+                    if (mCurrentSearchText != null && !mCurrentSearchText.trim().isEmpty()) {
+                        if (filteredItems.isEmpty()) {
+                            AlertDialogBuilder.showGenericDialog(getContext().getString(R.string.error), getContext().getString(R.string.multiSelectionSearchNoResults), getContext().getString(R.string.okay), null, false, getContext(), null);
+                            return;
+                        }
+
+                        boolean resultSelected = false;
+                        for (ListItemWithIndex item : filteredItems) {
+                            if (item.checked) {
+                                resultSelected = true;
+                                break;
+                            }
+                        }
+
+                        if (!resultSelected) {
+                            AlertDialogBuilder.showGenericDialog(getContext().getString(R.string.error), getContext().getString(R.string.multiSelectionSearchNoResultSelected), getContext().getString(R.string.okay), null, false, getContext(), null);
+                            return;
+                        }
+                    }
+
                     onDialogClosed(true);
                     mDialog.dismiss();
                 }
@@ -345,6 +379,10 @@ public class SearchableMultiSelectPreference extends ListPreference {
 
     private void restoreCheckedEntries() {
         CharSequence[] entryValues = getEntryValues();
+        if (entryValues == null || mClickedDialogEntryIndices == null
+                || mClickedDialogEntryIndices.length != entryValues.length) {
+            return;
+        }
         boolean checkAll = false;
         String[] vals = parseStoredValue(getValue());
 

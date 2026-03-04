@@ -88,9 +88,6 @@ import java.util.Objects;
 
 import me.pushy.sdk.Pushy;
 
-import com.red.alert.ui.elements.SliderPreference;
-import com.red.alert.ui.elements.dialogs.SliderPreferenceDialogFragmentCompat;
-
 public class GeneralPreferenceFragment extends BasePreferenceFragment {
     boolean mIsTesting;
     boolean mFcmTestPassed;
@@ -199,6 +196,9 @@ public class GeneralPreferenceFragment extends BasePreferenceFragment {
 
         // Broadcasts
         Broadcasts.subscribe(getContext(), this);
+
+        // Re-check battery optimization status when returning from system settings.
+        checkBatteryOptimization();
 
         // Reset UI to root state (title, back arrow, etc.)
         if (getActivity() instanceof com.red.alert.activities.Main) {
