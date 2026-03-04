@@ -77,10 +77,6 @@ import com.red.alert.utils.networking.HTTP;
 import com.red.alert.utils.os.AndroidSettings;
 import com.red.alert.utils.threading.AsyncTaskAdapter;
 
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import me.pushy.sdk.Pushy;
 import me.pushy.sdk.config.PushyForegroundService;
 import me.pushy.sdk.util.PushyAuthentication;
@@ -156,6 +152,9 @@ public class Main extends AppCompatActivity {
 
         // Pixel compatibility
         forceForegroundServiceOnPixelDevices();
+
+        // Delay cleanup to avoid impacting startup.
+        new Handler().postDelayed(() -> AppPreferences.deleteOldSharedPreferences(Main.this), 5 * 1000L);
 
         // Load initial fragment
         if (savedInstanceState == null) {

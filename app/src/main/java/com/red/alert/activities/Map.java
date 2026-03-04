@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -63,8 +64,6 @@ import com.red.alert.utils.threading.AsyncTaskAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import me.pushy.sdk.lib.jackson.core.type.TypeReference;
 
@@ -132,14 +131,8 @@ public class Map extends AppCompatActivity implements OnMapsSdkInitializedCallba
     }
 
     void useLegacyRenderer() {
-        // Use background thread to avoid ANR
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // Use legacy maps renderer
-                MapsInitializer.initialize(Map.this, MapsInitializer.Renderer.LEGACY, Map.this);
-            }
-        }).start();
+        // Use legacy maps renderer
+        MapsInitializer.initialize(Map.this, MapsInitializer.Renderer.LEGACY, Map.this);
     }
 
     void unpackExtras() {
@@ -215,6 +208,9 @@ public class Map extends AppCompatActivity implements OnMapsSdkInitializedCallba
             // Stop execution
             return;
         }
+
+        // Disable toolbar buttons (navigation / etc)
+        mMap.getUiSettings().setMapToolbarEnabled(false);
 
         // Check if night mode is enabled
         if ((getResources().getConfiguration().uiMode &
@@ -742,23 +738,20 @@ public class Map extends AppCompatActivity implements OnMapsSdkInitializedCallba
     }
 
     void pollRecentAlerts() {
-        // Schedule a new timer
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // App is running?
-                        if (mIsResumed) {
-                            // Reload every X seconds
-                            reloadRecentAlerts();
-                        }
-                    }
-                });
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                if (mIsResumed) {
+                    // Reload every X seconds
+                    reloadRecentAlerts();
+                }
+                handler.postDelayed(this, 1000L * RecentAlerts.RECENT_ALERTS_POLLING_INTERVAL_SEC);
             }
-        }, 1000 * RecentAlerts.RECENT_ALERTS_POLLING_INTERVAL_SEC,
-                1000 * RecentAlerts.RECENT_ALERTS_POLLING_INTERVAL_SEC);
+        }, 1000L * RecentAlerts.RECENT_ALERTS_POLLING_INTERVAL_SEC);
     }
 
     void reloadRecentAlerts() {

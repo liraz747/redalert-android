@@ -135,8 +135,14 @@ public class AlertLogic {
             return true;
         }
 
-        // Store as already processed
-        Singleton.getSharedPreferences(context).edit().putBoolean(key, true).commit();
+        try {
+            // Store as already processed
+            Singleton.getSharedPreferences(context).edit().putBoolean(key, true).apply();
+        }
+        catch (OutOfMemoryError exc) {
+            // Log for debug
+            Log.e(Logging.TAG, "Failed to save alert ID as processed", exc);
+        }
 
         // First time encountering this city & alert ID combo
         return false;
