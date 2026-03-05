@@ -4,13 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.widget.TextView;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceDataStore;
 import androidx.preference.PreferenceViewHolder;
 
-import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
 
 import com.red.alert.R;
@@ -83,7 +81,6 @@ public class SliderPreference extends Preference {
     public void onBindViewHolder(PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
-        TextView valueText = (TextView) holder.findViewById(R.id.slider_preference_value);
         Slider slider = (Slider) holder.findViewById(R.id.slider_preference_seekbar);
         if (slider == null) {
             return;
@@ -92,26 +89,13 @@ public class SliderPreference extends Preference {
         slider.clearOnChangeListeners();
         slider.setValueFrom(mMin);
         slider.setValueTo(mMax);
-        slider.setStepSize(1f);
+        slider.setStepSize(0f);
         slider.setEnabled(isEnabled());
-        slider.setLabelFormatter(new LabelFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return formatValueText(Math.round(value));
-            }
-        });
 
         slider.setValue(mValue);
-        if (valueText != null) {
-            valueText.setText(formatValueText(mValue));
-            valueText.setEnabled(isEnabled());
-        }
 
         slider.addOnChangeListener((changedSlider, value, fromUser) -> {
             int newValue = clamp(Math.round(value));
-            if (valueText != null) {
-                valueText.setText(formatValueText(newValue));
-            }
 
             if (!fromUser || newValue == mValue) {
                 return;
@@ -119,12 +103,11 @@ public class SliderPreference extends Preference {
 
             if (!callChangeListener(newValue)) {
                 changedSlider.setValue(mValue);
-                if (valueText != null) {
-                    valueText.setText(formatValueText(mValue));
-                }
                 return;
             }
 
+            // Keep a snapped integer value while allowing a continuous, non-ticked track.
+            changedSlider.setValue(newValue);
             setPersistedValue(newValue);
         });
     }
@@ -190,20 +173,6 @@ public class SliderPreference extends Preference {
             }
         }
         return clamp(mSliderDefaultValue);
-    }
-
-    private String formatValueText(int value) {
-        int percentage;
-        if (mMax > mMin) {
-            percentage = Math.round(((float) (value - mMin) / (float) (mMax - mMin)) * 100f);
-        } else {
-            percentage = value;
-        }
-
-        if (mUnits == null) {
-            return percentage + "%";
-        }
-        return percentage + "%" + mUnits;
     }
 
     private void persistIntCompat(int value) {

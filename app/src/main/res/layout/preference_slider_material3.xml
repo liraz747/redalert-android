@@ -56,21 +56,12 @@
         </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/slider_preference_value"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textAppearance="?attr/textAppearanceLabelLarge"
-        android:textColor="?attr/colorPrimary"
-        android:textStyle="bold" />
-
     <com.google.android.material.slider.Slider
         android:id="@+id/slider_preference_seekbar"
         style="?attr/sliderStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        app:labelBehavior="floating" />
+        android:layout_marginTop="2dp"
+        app:labelBehavior="gone" />
 
 </LinearLayout>
