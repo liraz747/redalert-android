@@ -99,6 +99,8 @@ public class AlertsFragment extends Fragment {
 
     // Static cache to prevent reloading on tab switch
     private static List<Alert> sCachedAlerts;
+    // Prevent polling refresh from racing clear animation.
+    private boolean mIsClearAnimationRunning = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -330,6 +332,10 @@ public class AlertsFragment extends Fragment {
     }
 
     public void reloadRecentAlerts() {
+        if (mIsClearAnimationRunning) {
+            return;
+        }
+
         if (!mIsReloading) {
             // Only show loading if we haven't loaded yet AND we don't have cached alerts
             boolean showLoading = !mHasLoaded && (sCachedAlerts == null || sCachedAlerts.isEmpty());
@@ -545,16 +551,21 @@ public class AlertsFragment extends Fragment {
         }
 
         if (mDisplayAlerts.size() == 0) {
-            // Fade in the no alerts view
-            mNoAlerts.setAlpha(0f);
-            mNoAlerts.setVisibility(View.VISIBLE);
-            mNoAlerts.animate()
-                .alpha(1f)
-                .setDuration(300)
-                .setInterpolator(new android.view.animation.DecelerateInterpolator())
-                .start();
+            // Only animate first appearance to avoid flicker on each auto-refresh.
+            if (mNoAlerts.getVisibility() != View.VISIBLE) {
+                mNoAlerts.setAlpha(0f);
+                mNoAlerts.setVisibility(View.VISIBLE);
+                mNoAlerts.animate()
+                        .alpha(1f)
+                        .setDuration(300)
+                        .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                        .start();
+            } else {
+                mNoAlerts.setAlpha(1f);
+            }
         } else {
             mNoAlerts.setVisibility(View.GONE);
+            mNoAlerts.setAlpha(1f);
         }
 
         // Notify Activity to update clear button visibility
@@ -699,12 +710,14 @@ public class AlertsFragment extends Fragment {
                 mSwipeRefresh.setRefreshing(false);
             }
 
-            // Always invalidate list to ensure empty state is shown if needed
-            invalidateAlertList();
+            if (!mIsClearAnimationRunning) {
+                // Always invalidate list to ensure empty state is shown if needed
+                invalidateAlertList();
 
-            // Notify Activity to update menu button state
-            if (getActivity() instanceof Main) {
-                ((Main) getActivity()).updateClearRestoreButton();
+                // Notify Activity to update menu button state
+                if (getActivity() instanceof Main) {
+                    ((Main) getActivity()).updateClearRestoreButton();
+                }
             }
 
             if (errorStringResource != 0) {
@@ -722,6 +735,10 @@ public class AlertsFragment extends Fragment {
     
     // Handle clear/restore button click (called from Activity)
     public void handleClearRestoreClick() {
+        if (mIsClearAnimationRunning) {
+            return;
+        }
+
         // Check current state - is it cleared?
         long currentCutoff = AppPreferences.getRecentAlertsCutoffTimestamp(getContext());
         
@@ -743,17 +760,23 @@ public class AlertsFragment extends Fragment {
                         public void onClick(DialogInterface dialogInterface, int which) {
                             // Clicked okay?
                             if (which == DialogInterface.BUTTON_POSITIVE) {
+                                mIsClearAnimationRunning = true;
                                 // Animate alerts clearing with cascade fade-out
                                 animateClearAlerts(() -> {
                                     // Set recent alerts cutoff timestamp to now
                                     AppPreferences.updateRecentAlertsCutoffTimestamp(DateTime.getUnixTimestamp(),
                                             getContext());
 
-                                    // Reload alerts
-                                    reloadRecentAlerts();
-
                                     // Clear app notifications
                                     AppNotifications.clearAll(getContext());
+
+                                    // Immediately apply cutoff to currently cached alerts so UI is stable.
+                                    invalidateAlertList();
+
+                                    mIsClearAnimationRunning = false;
+
+                                    // Refresh in background for latest server state.
+                                    reloadRecentAlerts();
                                 });
                             }
                         }

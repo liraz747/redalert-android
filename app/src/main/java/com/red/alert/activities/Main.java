@@ -980,11 +980,21 @@ public class Main extends AppCompatActivity {
     // Menu item references for direct manipulation
     private MenuItem mShareMenuItem;
     private MenuItem mClearRestoreMenuItem;
+
+    private boolean isAlertsListFragmentActive() {
+        if (mCurrentTabId != R.id.nav_alerts) {
+            return false;
+        }
+
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        return currentFragment instanceof AlertsFragment;
+    }
     
     // Directly update menu items visibility - called synchronously when switching tabs
     private void updateMenuItemsVisibility() {
         boolean isMapTab = (mCurrentTabId == R.id.nav_map);
         boolean isAlertsTab = (mCurrentTabId == R.id.nav_alerts);
+        boolean isAlertsListActive = isAlertsListFragmentActive();
         
         // Share button - only on Map tab
         if (mShareMenuItem != null) {
@@ -998,7 +1008,7 @@ public class Main extends AppCompatActivity {
         
         // Clear/Restore button - only on Alerts tab
         if (mClearRestoreMenuItem != null) {
-            if (isAlertsTab) {
+            if (isAlertsTab && isAlertsListActive) {
                 // Get cutoff timestamp
                 long cutoffTimestamp = AppPreferences.getRecentAlertsCutoffTimestamp(this);
                 
@@ -1016,9 +1026,7 @@ public class Main extends AppCompatActivity {
                         mClearRestoreMenuItem.setTitle(getString(R.string.clearRecentAlerts));
                         mClearRestoreMenuItem.setVisible(hasAlerts);
                     } else {
-                        // Fragment not loaded yet, show button by default (will be updated later)
-                        mClearRestoreMenuItem.setIcon(R.drawable.ic_clear_all);
-                        mClearRestoreMenuItem.setVisible(true);
+                        mClearRestoreMenuItem.setVisible(false);
                     }
                 }
             } else {
@@ -1036,6 +1044,7 @@ public class Main extends AppCompatActivity {
         
         boolean isMapTab = (mCurrentTabId == R.id.nav_map);
         boolean isAlertsTab = (mCurrentTabId == R.id.nav_alerts);
+        boolean isAlertsListActive = isAlertsListFragmentActive();
         
         // Share button - only on Map tab
         if (shareItem != null) {
@@ -1049,7 +1058,7 @@ public class Main extends AppCompatActivity {
         
         // Clear/Restore button - only on Alerts tab
         if (clearRestoreItem != null) {
-            if (isAlertsTab) {
+            if (isAlertsTab && isAlertsListActive) {
                 // Get cutoff timestamp
                 long cutoffTimestamp = AppPreferences.getRecentAlertsCutoffTimestamp(this);
                 

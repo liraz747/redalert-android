@@ -5,43 +5,56 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 
-import androidx.preference.DialogPreference;
 import androidx.preference.PreferenceDataStore;
-import androidx.preference.PreferenceViewHolder;
+import androidx.preference.SeekBarPreference;
 
 import com.red.alert.R;
 
-public class SliderPreference extends DialogPreference {
+public class SliderPreference extends SeekBarPreference {
     private int mMin, mMax, mSliderDefaultValue;
     private String mUnits;
 
     public SliderPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        // Defaults from SeekBarPreference attributes.
+        int defaultMin = getMin();
+        int defaultMax = getMax();
+
         // Get custom attributes
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SliderPreference);
-        mMin = a.getInt(R.styleable.SliderPreference_min, 0);
-        mMax = a.getInt(R.styleable.SliderPreference_max, 100);
-        mSliderDefaultValue = a.getInt(R.styleable.SliderPreference_sliderDefaultValue, 50);
+        mMin = a.hasValue(R.styleable.SliderPreference_min)
+                ? a.getInt(R.styleable.SliderPreference_min, defaultMin)
+                : defaultMin;
+        mMax = a.hasValue(R.styleable.SliderPreference_max)
+                ? a.getInt(R.styleable.SliderPreference_max, defaultMax)
+                : defaultMax;
+        mSliderDefaultValue = a.hasValue(R.styleable.SliderPreference_sliderDefaultValue)
+                ? a.getInt(R.styleable.SliderPreference_sliderDefaultValue, 50)
+                : 50;
         mUnits = a.getString(R.styleable.SliderPreference_units);
         a.recycle();
 
-        // Set layout
-        setDialogLayoutResource(R.layout.slider_preference_dialog);
+        if (mMax < mMin) {
+            mMax = mMin;
+        }
+
+        setMin(mMin);
+        setMax(mMax);
+        setAdjustable(true);
+        setUpdatesContinuously(false);
+        setShowSeekBarValue(false);
     }
 
     @Override
-    public void onBindViewHolder(PreferenceViewHolder holder) {
-        super.onBindViewHolder(holder);
-        holder.itemView.setClickable(true);
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return a.getInt(index, mSliderDefaultValue);
     }
 
-    public int getMin() {
-        return mMin;
-    }
-
-    public int getMax() {
-        return mMax;
+    @Override
+    protected void onSetInitialValue(Object defaultValue) {
+        int resolvedDefault = resolveDefault(defaultValue);
+        setValue(getPersistedValue(resolvedDefault));
     }
 
     public int getSliderDefaultValue() {
@@ -78,10 +91,24 @@ public class SliderPreference extends DialogPreference {
     public void setPersistedValue(int value) {
         int clamped = clamp(value);
         persistIntCompat(clamped);
+        notifyChanged();
     }
 
     private int clamp(int value) {
         return Math.max(mMin, Math.min(mMax, value));
+    }
+
+    private int resolveDefault(Object defaultValue) {
+        if (defaultValue instanceof Number) {
+            return clamp(((Number) defaultValue).intValue());
+        }
+        if (defaultValue instanceof String) {
+            try {
+                return clamp(Integer.parseInt((String) defaultValue));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return clamp(mSliderDefaultValue);
     }
 
     private void persistIntCompat(int value) {
