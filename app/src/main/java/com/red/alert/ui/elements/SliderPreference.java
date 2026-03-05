@@ -4,22 +4,29 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.widget.TextView;
 
+import androidx.preference.Preference;
 import androidx.preference.PreferenceDataStore;
-import androidx.preference.SeekBarPreference;
+import androidx.preference.PreferenceViewHolder;
+
+import com.google.android.material.slider.LabelFormatter;
+import com.google.android.material.slider.Slider;
 
 import com.red.alert.R;
 
-public class SliderPreference extends SeekBarPreference {
+public class SliderPreference extends Preference {
     private int mMin, mMax, mSliderDefaultValue;
+    private int mValue;
     private String mUnits;
 
     public SliderPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setLayoutResource(R.layout.preference_slider_material3);
+        setSelectable(false);
 
-        // Defaults from SeekBarPreference attributes.
-        int defaultMin = getMin();
-        int defaultMax = getMax();
+        int defaultMin = 0;
+        int defaultMax = 100;
 
         // Get custom attributes
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SliderPreference);
@@ -38,12 +45,6 @@ public class SliderPreference extends SeekBarPreference {
         if (mMax < mMin) {
             mMax = mMin;
         }
-
-        setMin(mMin);
-        setMax(mMax);
-        setAdjustable(true);
-        setUpdatesContinuously(false);
-        setShowSeekBarValue(false);
     }
 
     @Override
@@ -75,7 +76,57 @@ public class SliderPreference extends SeekBarPreference {
     @Override
     protected void onSetInitialValue(Object defaultValue) {
         int resolvedDefault = resolveDefault(defaultValue);
-        setValue(getPersistedValue(resolvedDefault));
+        mValue = getPersistedValue(resolvedDefault);
+    }
+
+    @Override
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
+
+        TextView valueText = (TextView) holder.findViewById(R.id.slider_preference_value);
+        Slider slider = (Slider) holder.findViewById(R.id.slider_preference_seekbar);
+        if (slider == null) {
+            return;
+        }
+
+        slider.clearOnChangeListeners();
+        slider.setValueFrom(mMin);
+        slider.setValueTo(mMax);
+        slider.setStepSize(1f);
+        slider.setEnabled(isEnabled());
+        slider.setLabelFormatter(new LabelFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return formatValueText(Math.round(value));
+            }
+        });
+
+        slider.setValue(mValue);
+        if (valueText != null) {
+            valueText.setText(formatValueText(mValue));
+            valueText.setEnabled(isEnabled());
+        }
+
+        slider.addOnChangeListener((changedSlider, value, fromUser) -> {
+            int newValue = clamp(Math.round(value));
+            if (valueText != null) {
+                valueText.setText(formatValueText(newValue));
+            }
+
+            if (!fromUser || newValue == mValue) {
+                return;
+            }
+
+            if (!callChangeListener(newValue)) {
+                changedSlider.setValue(mValue);
+                if (valueText != null) {
+                    valueText.setText(formatValueText(mValue));
+                }
+                return;
+            }
+
+            setPersistedValue(newValue);
+        });
     }
 
     public int getSliderDefaultValue() {
@@ -84,6 +135,14 @@ public class SliderPreference extends SeekBarPreference {
 
     public String getUnits() {
         return mUnits;
+    }
+
+    public int getMin() {
+        return mMin;
+    }
+
+    public int getMax() {
+        return mMax;
     }
 
     // Public wrapper for protected getPersistedInt
@@ -104,6 +163,7 @@ public class SliderPreference extends SeekBarPreference {
     // Public wrapper for protected persistInt
     public void setPersistedValue(int value) {
         int clamped = clamp(value);
+        mValue = clamped;
         persistIntCompat(clamped);
         notifyChanged();
     }
@@ -130,6 +190,20 @@ public class SliderPreference extends SeekBarPreference {
             }
         }
         return clamp(mSliderDefaultValue);
+    }
+
+    private String formatValueText(int value) {
+        int percentage;
+        if (mMax > mMin) {
+            percentage = Math.round(((float) (value - mMin) / (float) (mMax - mMin)) * 100f);
+        } else {
+            percentage = value;
+        }
+
+        if (mUnits == null) {
+            return percentage + "%";
+        }
+        return percentage + "%" + mUnits;
     }
 
     private void persistIntCompat(int value) {

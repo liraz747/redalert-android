@@ -752,6 +752,9 @@ public class AlertsFragment extends Fragment {
             
             // Set flag to animate items appearing
             mPendingRestoreAnimation = true;
+
+            // Restore immediately from cached alerts while background refresh runs.
+            invalidateAlertList(true);
             
             // Reload alerts (animation will be triggered after layout)
             reloadRecentAlerts();
