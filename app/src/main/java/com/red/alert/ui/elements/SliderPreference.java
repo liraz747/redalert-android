@@ -21,7 +21,7 @@ public class SliderPreference extends Preference {
     public SliderPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setLayoutResource(R.layout.preference_slider_material3);
-        setSelectable(false);
+        setSelectable(true);
 
         int defaultMin = 0;
         int defaultMax = 100;
