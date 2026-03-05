@@ -497,7 +497,11 @@ public class AlertsFragment extends Fragment {
     }
 
     void invalidateAlertList() {
-        if (mIsReloading) {
+        invalidateAlertList(false);
+    }
+
+    void invalidateAlertList(boolean forceWhileReloading) {
+        if (mIsReloading && !forceWhileReloading) {
             return;
         }
 
@@ -771,7 +775,7 @@ public class AlertsFragment extends Fragment {
                                     AppNotifications.clearAll(getContext());
 
                                     // Immediately apply cutoff to currently cached alerts so UI is stable.
-                                    invalidateAlertList();
+                                    invalidateAlertList(true);
 
                                     mIsClearAnimationRunning = false;
 

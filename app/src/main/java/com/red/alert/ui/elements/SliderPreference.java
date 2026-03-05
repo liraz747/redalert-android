@@ -48,7 +48,28 @@ public class SliderPreference extends SeekBarPreference {
 
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
-        return a.getInt(index, mSliderDefaultValue);
+        try {
+            return clamp(a.getInt(index, mSliderDefaultValue));
+        } catch (RuntimeException ignored) {
+        }
+
+        try {
+            return clamp(normalizeSliderValue(a.getFloat(index, mSliderDefaultValue / 100.0f)));
+        } catch (RuntimeException ignored) {
+        }
+
+        String raw = a.getString(index);
+        if (raw != null) {
+            try {
+                if (raw.contains(".")) {
+                    return clamp(normalizeSliderValue(Float.parseFloat(raw)));
+                }
+                return clamp(Integer.parseInt(raw));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        return clamp(mSliderDefaultValue);
     }
 
     @Override
@@ -73,14 +94,7 @@ public class SliderPreference extends SeekBarPreference {
         } catch (ClassCastException ignored) {
             // Backward compatibility: previous versions stored slider values as float [0..1].
             float legacyValue = getPersistedFloat(defaultValue / 100.0f);
-            int migrated;
-            if (legacyValue >= 0f && legacyValue <= 1f) {
-                migrated = Math.round(legacyValue * 100f);
-            } else {
-                migrated = Math.round(legacyValue);
-            }
-
-            migrated = clamp(migrated);
+            int migrated = clamp(normalizeSliderValue(legacyValue));
             persistIntCompat(migrated);
 
             return migrated;
@@ -96,6 +110,13 @@ public class SliderPreference extends SeekBarPreference {
 
     private int clamp(int value) {
         return Math.max(mMin, Math.min(mMax, value));
+    }
+
+    private int normalizeSliderValue(float rawValue) {
+        if (rawValue >= 0f && rawValue <= 1f) {
+            return Math.round(rawValue * 100f);
+        }
+        return Math.round(rawValue);
     }
 
     private int resolveDefault(Object defaultValue) {
