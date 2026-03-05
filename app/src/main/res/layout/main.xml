@@ -41,7 +41,6 @@
         android:layout_height="wrap_content"
         android:elevation="8dp"
         app:backgroundTint="@color/bottom_nav_background"
-        app:itemBackground="@drawable/bottom_nav_item_background"
         app:itemIconTint="@color/bottom_nav_item_tint"
         app:itemTextColor="@color/bottom_nav_item_tint"
         app:menu="@menu/bottom_nav"
