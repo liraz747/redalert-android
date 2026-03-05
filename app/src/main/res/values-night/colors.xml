@@ -52,4 +52,8 @@
     <color name="md3_inverseSurface">#ede0dc</color>
     <color name="md3_inverseOnSurface">#362f2d</color>
     <color name="md3_inversePrimary">#ff4032</color>
+
+    <!-- Bottom navigation -->
+    <color name="bottom_nav_background">@color/md3_surfaceContainer</color>
+    <color name="bottom_nav_active_indicator">#40FF4032</color>
 </resources>
