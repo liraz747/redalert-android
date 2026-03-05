@@ -178,8 +178,10 @@ cat >"$RESULTS_DIR/master_seed.xml" <<'EOF'
 EOF
 
 adb push "$RESULTS_DIR/master_seed.xml" /data/local/tmp/master_seed.xml >/dev/null
+adb shell run-as "$PACKAGE_NAME" mkdir -p "/data/data/$PACKAGE_NAME/shared_prefs"
 adb shell run-as "$PACKAGE_NAME" cp /data/local/tmp/master_seed.xml "$PREFS_PATH"
 adb shell run-as "$PACKAGE_NAME" chmod 660 "$PREFS_PATH"
+adb shell run-as "$PACKAGE_NAME" test -f "$PREFS_PATH"
 
 echo "Upgrading to PR debug APK..."
 adb install -r "$PR_APK"
