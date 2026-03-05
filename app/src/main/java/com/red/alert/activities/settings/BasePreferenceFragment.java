@@ -14,9 +14,6 @@ import com.red.alert.utils.communication.Broadcasts;
 import com.red.alert.utils.localization.Localization;
 
 import androidx.preference.Preference;
-import androidx.fragment.app.DialogFragment;
-import com.red.alert.ui.elements.SliderPreference;
-import com.red.alert.ui.elements.dialogs.SliderPreferenceDialogFragmentCompat;
 
 public class BasePreferenceFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -175,15 +172,9 @@ public class BasePreferenceFragment extends PreferenceFragmentCompat
 
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
-        // Try casting the preference to the custom preference
-        if (preference instanceof SliderPreference) {
-            // Create a new instance of SliderPreferenceDialogFragment with a key
-            DialogFragment dialogFragment = SliderPreferenceDialogFragmentCompat.newInstance(preference.getKey());
-            dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getParentFragmentManager(), null);
-        } else if (preference instanceof androidx.preference.ListPreference) {
+        if (preference instanceof androidx.preference.ListPreference) {
             // Use Material 3 ListPreference dialog
-            DialogFragment dialogFragment = com.red.alert.ui.elements.dialogs.MaterialListPreferenceDialogFragmentCompat
+            androidx.fragment.app.DialogFragment dialogFragment = com.red.alert.ui.elements.dialogs.MaterialListPreferenceDialogFragmentCompat
                     .newInstance(preference.getKey());
             dialogFragment.setTargetFragment(this, 0);
             dialogFragment.show(getParentFragmentManager(), null);

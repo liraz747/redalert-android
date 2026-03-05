@@ -4,14 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.fragment.app.DialogFragment;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.red.alert.R;
 import com.red.alert.ui.elements.SliderPreference;
-import com.red.alert.ui.elements.dialogs.SliderPreferenceDialogFragmentCompat;
 
 public class LocationAlertsPreferenceFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
     private LocationAlerts mActivity;
@@ -19,19 +16,6 @@ public class LocationAlertsPreferenceFragment extends PreferenceFragmentCompat i
     private SliderPreference mFrequency;
     private SliderPreference mMaxDistance;
     private SwitchPreferenceCompat mLocationAlerts;
-
-    @Override
-    public void onDisplayPreferenceDialog(Preference preference) {
-        // Try casting the preference to the custom preference
-        if (preference instanceof SliderPreference) {
-            // Create a new instance of SliderPreferenceDialogFragment with a key
-            DialogFragment dialogFragment = SliderPreferenceDialogFragmentCompat.newInstance(preference.getKey());
-            dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getParentFragmentManager(), null);
-        } else {
-            super.onDisplayPreferenceDialog(preference);
-        }
-    }
 
     @Override
     public void onAttach(Context context) {

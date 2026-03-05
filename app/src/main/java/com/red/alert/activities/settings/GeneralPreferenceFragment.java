@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
@@ -65,8 +64,6 @@ import com.red.alert.model.req.SelfTestRequest;
 import com.red.alert.ui.elements.MaterialProgressDialog;
 import com.red.alert.ui.dialogs.AlertDialogBuilder;
 import com.red.alert.ui.elements.SearchableMultiSelectPreference;
-import com.red.alert.ui.elements.SliderPreference;
-import com.red.alert.ui.elements.dialogs.SliderPreferenceDialogFragmentCompat;
 import com.red.alert.ui.localization.rtl.RTLSupport;
 import com.red.alert.ui.notifications.AppNotifications;
 import com.red.alert.utils.backend.RedAlertAPI;

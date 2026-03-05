@@ -10,9 +10,6 @@ import androidx.preference.SwitchPreferenceCompat;
 import com.red.alert.R;
 import com.red.alert.ui.elements.SearchableMultiSelectPreference;
 import com.red.alert.ui.elements.SliderPreference;
-import com.red.alert.ui.elements.dialogs.SliderPreferenceDialogFragmentCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.preference.Preference;
 
 public class SecondaryAlertsPreferenceFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
     private SecondaryAlerts mActivity;
@@ -69,15 +66,4 @@ public class SecondaryAlertsPreferenceFragment extends PreferenceFragmentCompat 
     public SwitchPreferenceCompat getSecondaryAlertPopup() { return mSecondaryAlertPopup; }
     public SwitchPreferenceCompat getSecondaryNotificationsEnabled() { return mSecondaryNotificationsEnabled; }
     public SearchableMultiSelectPreference getSecondaryCitySelection() { return mSecondaryCitySelection; }
-
-    @Override
-    public void onDisplayPreferenceDialog(Preference preference) {
-        if (preference instanceof SliderPreference) {
-            DialogFragment dialogFragment = SliderPreferenceDialogFragmentCompat.newInstance(preference.getKey());
-            dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getParentFragmentManager(), null);
-        } else {
-            super.onDisplayPreferenceDialog(preference);
-        }
-    }
 }
