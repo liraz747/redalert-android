@@ -60,6 +60,30 @@ tap_required() {
   python3 "$UI_HELPER" tap "${args[@]}" --clickable --timeout 20
 }
 
+tap_text_variants() {
+  local text
+  for text in "$@"; do
+    if tap_optional --text "$text"; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+tap_preference_resilient() {
+  local labels=("$@")
+  local attempt
+  for attempt in $(seq 1 8); do
+    if tap_text_variants "${labels[@]}"; then
+      return 0
+    fi
+    adb shell input swipe 540 1850 540 950 250
+    sleep 0.6
+  done
+  echo "no match for labels: ${labels[*]}" >&2
+  return 1
+}
+
 exists() {
   local args=("$@")
   python3 "$UI_HELPER" exists "${args[@]}"
@@ -197,13 +221,11 @@ tap_required --id com.red.alert:id/nav_settings
 sleep 1
 
 echo "Navigating to Advanced Settings..."
-adb shell input swipe 540 1800 540 1000 250
-sleep 0.7
-tap_required --text "Advanced Settings"
+tap_preference_resilient "Advanced Settings" "הגדרות מתקדמות"
 sleep 1
 
 echo "Validating Advanced volume slider opens..."
-tap_required --text "Volume level"
+tap_preference_resilient "Volume level" "עוצמת צליל"
 if [[ "$(exists --id com.red.alert:id/slider_preference_seekbar)" != "1" ]]; then
   echo "Advanced volume slider did not appear." >&2
   exit 1
@@ -212,16 +234,16 @@ tap_optional --id android:id/button2 || tap_optional --text "Cancel" || true
 sleep 0.5
 
 echo "Validating Secondary Alerts dialogs..."
-tap_required --text "Secondary Alerts"
+tap_preference_resilient "Secondary Alerts" "התרעות משנה"
 sleep 1
-tap_required --text "Secondary cities"
+tap_preference_resilient "Secondary cities" "יישובי משנה"
 if [[ "$(exists --id com.red.alert:id/searchListView)" != "1" ]]; then
   echo "Secondary cities dialog list did not appear." >&2
   exit 1
 fi
 tap_optional --id android:id/button2 || tap_optional --text "Cancel" || true
 sleep 0.5
-tap_required --text "Volume level"
+tap_preference_resilient "Volume level" "עוצמת צליל"
 if [[ "$(exists --id com.red.alert:id/slider_preference_seekbar)" != "1" ]]; then
   echo "Secondary volume slider did not appear." >&2
   exit 1
@@ -232,18 +254,16 @@ sleep 0.5
 echo "Validating Location alerts sliders..."
 adb shell input keyevent 4
 sleep 0.8
-adb shell input swipe 540 1800 540 1200 250
-sleep 0.6
-tap_required --text "Location-based alerts"
+tap_preference_resilient "Location-based alerts" "התרעות לפי מיקום"
 sleep 1
-tap_required --text "Update interval"
+tap_preference_resilient "Update interval" "קצב דגימה"
 if [[ "$(exists --id com.red.alert:id/slider_preference_seekbar)" != "1" ]]; then
   echo "Location update interval slider did not appear." >&2
   exit 1
 fi
 tap_optional --id android:id/button2 || tap_optional --text "Cancel" || true
 sleep 0.5
-tap_required --text "Max distance"
+tap_preference_resilient "Max distance" "מרחק מקסימלי"
 if [[ "$(exists --id com.red.alert:id/slider_preference_seekbar)" != "1" ]]; then
   echo "Location max distance slider did not appear." >&2
   exit 1
